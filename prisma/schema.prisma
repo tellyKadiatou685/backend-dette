@@ -1,0 +1,45 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Client {
+  id        Int      @id @default(autoincrement())
+  surname   String   @unique
+  telephone String   @unique
+  adresse   String?  
+  qrcode    String?  
+  userId    Int?     @unique
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id        Int               @id @default(autoincrement())
+  nom       String
+  prenom    String
+  photo     String
+  login     String            @unique
+  password  String
+  active    UserActiveStatus  @default(ACTIVE)  // L'état de l'utilisateur (ACTIF ou INACTIF)
+  role      RoleType          // Le rôle de l'utilisateur (ADMIN, BOUTIQUIER, CLIENT)
+  client    Client?           // Relation 1-1 avec Client
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+}
+
+enum RoleType {
+  ADMIN
+  BOUTIQUIER
+  CLIENT
+}
+
+enum UserActiveStatus {
+  ACTIVE
+  INACTIVE
+}
